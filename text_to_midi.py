@@ -1,24 +1,20 @@
 import mido
+from encode_dataset import DatasetEncoder
+import os
 
-PATH = "/home/oem/PycharmProjects/midi_notes_reader/maestro-v3.0.0/2004/MIDI-Unprocessed_SMF_02_R1_2004_01-05_ORIG_MID--AUDIO_02_R1_2004_05_Track05_wav.midi"
+if os.path.exists("output.mid"):
+    os.remove("output.mid")
+    print("Deleting output.mid ")
 
-file = mido.MidiFile(filename=PATH)
-print(file.ticks_per_beat)
-msg_types = {}
+datasetEncoder = DatasetEncoder()
 
-print("start")
-message_strings = ""
-for track in file.tracks:
-    for msg in track:
-        msg_types[msg.type] = msg
-        if isinstance(msg, mido.Message):
-            if msg.type in ["note_on"]:
-                message_strings += f"{msg.type} N{msg.note} {'ON' if msg.velocity > 0 else 'OFF'} T{msg.time} . "
-            if msg.type == "control_change":
-                message_strings += f"{msg.type} C{msg.control} V{60} T{msg.time} . "
+tokens = datasetEncoder.open_token_sequences("token_sequences.pickle")
+datasetEncoder.open_token_dictionary("token_dictionary.pickle")
+
+message_strings = datasetEncoder.decode_ints(tokens[3])
+print(message_strings)
 
 output = mido.MidiFile()
-
 midi_messages = [mido.MetaMessage('set_tempo', tempo=500000, time=0),
                  mido.MetaMessage('time_signature', numerator=4, denominator=4, clocks_per_click=24,
                                   notated_32nd_notes_per_beat=8, time=0)]
@@ -44,6 +40,4 @@ for msg in message_strings.split("."):
                              time=int(msg_parts[3].strip("T"))))
 
 output.tracks.append(midi_messages)
-output.save("a.mid")
-
-print(msg_types)
+output.save("output.mid")
