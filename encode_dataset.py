@@ -10,7 +10,7 @@ class DatasetEncoder:
         self.path = ""
         self.midi_files_list = []
         self._file_parser()
-        self.tokens_dictionary = {".": 0}
+        self.tokens_dictionary = {".": 1}
         self.tokens_sequences = []
 
     def set_path(self, path):
@@ -30,6 +30,15 @@ class DatasetEncoder:
             token_strings = encoder.encode_as_strings()
             token_ints, self.tokens_dictionary = encoder.encode_as_ints(token_strings, self.tokens_dictionary)
             self.tokens_sequences.append(token_ints)
+        return self.tokens_sequences
+
+    def convert_midis_to_string_words(self):
+        """do not use this method with convert_midis_to_tokens"""
+        for index, file in enumerate(self.midi_files_list):
+            print(f"\nFile number {index}:\n {file}")
+            encoder = Encoder(file)
+            token_strings = encoder.encode_as_strings()
+            self.tokens_sequences.append(token_strings)
         return self.tokens_sequences
 
     def save_tokens(self, json_save=False):
@@ -61,13 +70,17 @@ class DatasetEncoder:
             self.tokens_sequences = self.__open_json(path)
         elif path.endswith(".pickle"):
             self.tokens_sequences = self.__open_pickle(path)
+        print(f"Unique music pieces count: {len(self.tokens_sequences)}")
         return self.tokens_sequences
+
 
     def open_token_dictionary(self, path):
         if path.endswith(".json"):
             self.tokens_dictionary = self.__open_json(path)
         elif path.endswith(".pickle"):
             self.tokens_dictionary = self.__open_pickle(path)
+
+        print(f"Vocab size: {len(self.tokens_dictionary)}")
         return self.tokens_dictionary
 
     def decode_ints(self, tokens:list) -> str:

@@ -6,7 +6,7 @@ class Encoder:
         self.file = mido.MidiFile(filename=path)
         self.tokens_dictionary = {}
         self.dictionary_of_tokens = {}
-        self.vocabulary = {".": True}
+        self.vocabulary = {".": 1}
 
     def __add_words_to_vocabulary(self, *args):
         for arg in args:
