@@ -7,17 +7,21 @@ from encoder_decoder import Encoder
 
 class DatasetEncoder:
     def __init__(self):
-        self.path = ""
+        self._path = ""
         self.midi_files_list = []
-        self._file_parser()
-        self.tokens_dictionary = {".": 1}
+        self.tokens_dictionary = {}
         self.tokens_sequences = []
 
-    def set_path(self, path):
-        self.path = path
+    @property
+    def path(self):
+        return self._path
 
-    def _file_parser(self):
-        filenames = glob.glob(self.path + "\**\*.*", recursive=True)
+    @path.setter
+    def path(self, p):
+        self._path = p
+
+    def find_midi_files(self):
+        filenames = glob.glob(self._path + "/**/*.*", recursive=True)
         for f in filenames:
             if f.endswith(".mid") or f.endswith(".midi"):
                 self.midi_files_list.append(f)
@@ -73,7 +77,6 @@ class DatasetEncoder:
         print(f"Unique music pieces count: {len(self.tokens_sequences)}")
         return self.tokens_sequences
 
-
     def open_token_dictionary(self, path):
         if path.endswith(".json"):
             self.tokens_dictionary = self.__open_json(path)
@@ -83,7 +86,7 @@ class DatasetEncoder:
         print(f"Vocab size: {len(self.tokens_dictionary)}")
         return self.tokens_dictionary
 
-    def decode_ints(self, tokens:list) -> str:
+    def decode_ints(self, tokens: list) -> str:
         decoded_tokens = ""
         inv_tokens_dictionary = {v: k for k, v in self.tokens_dictionary.items()}
         for number in tokens:

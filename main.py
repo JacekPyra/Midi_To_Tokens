@@ -2,9 +2,10 @@ import encode_dataset as ed
 
 
 dataset = ed.DatasetEncoder()
-dataset.set_path("maestro-v3.0.0")
+dataset.path = "/home/oem/PycharmProjects/midi_notes_reader"
+dataset.find_midi_files()
 
-print(dataset._file_parser())
+
 tokens = dataset.convert_midis_to_string_words()
 print(dataset.tokens_dictionary)
 print(len(dataset.tokens_dictionary))
